@@ -5,12 +5,10 @@ import PModal from "./PModal";
 import PHeader from "./PHeader"; 
 import { PMain } from "./PMain";
 import { PFooter } from "./PFooter";
-// import { fetchData } from "./modules/wpApi"; 
 import { PPagination } from "./PPagination";
 import { ArticleContext } from "./modules/Store";
 import { PArticle } from "./PArticleModal";
 import { getWpPosts, getWpTags, getWpUsers } from "./modules/wpAPIFetch";
-import { scrollBackToInitial } from "./modules/scrollBackToInitial";
 // import { modifyAtags } from "./modules/modifyAtags";
 
  
@@ -55,8 +53,6 @@ const App = (props) => {
     const [isArticleOpen, setIsArticleOpen] = useState(false)
     // どの記事がarticke modalにセットされるか
     const [whichArticle, setWhichArticle] = useState(0)
-    // PMainの横方向のスクロール位置
-    // const [scrollX, setScrollX] = useState(0)
     
     const handleCloseArticleModal = () => {
         setIsArticleOpen(false)

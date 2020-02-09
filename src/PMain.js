@@ -56,7 +56,7 @@ export const PMain = ({ setIsArticleOpen, setWhichArticle, elevation }) => {
          }
 
          return (
-           <Grid container wrap="nowrap" className={`${classes.root} p_main`}>
+           <Grid container wrap="nowrap" className={classes.root}>
              {displayArticles}
            </Grid>
          );
