@@ -5,7 +5,7 @@ import PModal from "./PModal";
 import PHeader from "./PHeader"; 
 import { PMain } from "./PMain";
 import { PFooter } from "./PFooter";
-// import { fetchData } from "./modules/wpApi";
+// import { fetchData } from "./modules/wpApi"; 
 import { PPagination } from "./PPagination";
 import { ArticleContext } from "./modules/Store";
 import { PArticle } from "./PArticleModal";
@@ -78,12 +78,18 @@ const App = (props) => {
     
     useEffect(() => {
       getWpPosts(params, setTotalPages, setArticles);
-    //   scrollBackToInitial()
+        console.log('getWpPosts');
+        
     }, [params]);
 
-    useEffect(() => getWpTags(setTags), []);
-    useEffect(() => getWpUsers(setAuthors), []);
- 
+    useEffect(() => {
+        getWpTags(setTags)
+        getWpUsers(setAuthors);
+        console.log("getWpTags,setAuthors");
+    }, []);
+    
+    console.log('Appだよ');
+    
     return (
       <Grid
         spacing={0}
