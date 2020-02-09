@@ -16,7 +16,7 @@ const PHeader = props => {
   const classes = useStyles();
 
   return (
-    <Paper className={`${classes.root}`} elevation={props.elevation}>
+    <Paper className={`${classes.root}`} elevation={props.elevation} onClick={props.onClick}>
       <h1 className={classes.h1}>Reactで作ったportal</h1>
     </Paper>
   );

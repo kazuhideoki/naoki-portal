@@ -19,6 +19,7 @@ const useStyles = makeStyles({
     }
 });
 
+
 export const PMain = ({ setIsArticleOpen, setWhichArticle, elevation }) => {
          const classes = useStyles();
          const { articles } = React.useContext(
@@ -55,7 +56,7 @@ export const PMain = ({ setIsArticleOpen, setWhichArticle, elevation }) => {
          }
 
          return (
-           <Grid container wrap="nowrap" className={classes.root}>
+           <Grid container wrap="nowrap" className={`${classes.root} p_main`}>
              {displayArticles}
            </Grid>
          );

@@ -63,9 +63,9 @@ export const PArticle = ({ isArticleOpen, onClick, whichArticle, ...props }) => 
     // React.useEffect(() => {
     //     modifyAtags(fetchSinglePost(articles, setArticles));
     // }, [whichArticle])
-    React.useEffect(() => {
-        fetchSinglePost(articles, setArticles);
-    }, [whichArticle])
+    // React.useEffect(() => {
+    //     fetchSinglePost(articles, setArticles);
+    // }, [whichArticle])
 
     return (
       <StyledDialog

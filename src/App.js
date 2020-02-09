@@ -9,9 +9,8 @@ import { PFooter } from "./PFooter";
 import { PPagination } from "./PPagination";
 import { ArticleContext } from "./modules/Store";
 import { PArticle } from "./PArticleModal";
-import { getWpPosts, getWpTags, getWpUsers } from "./modules/wpApiFetch";
-import { fetchDataTags } from "./modules/wpApiTags";
-import { fetchDataUsers } from "./modules/wpApiUsers";
+import { getWpPosts, getWpTags, getWpUsers } from "./modules/wpAPIFetch";
+import { scrollBackToInitial } from "./modules/scrollBackToInitial";
 // import { modifyAtags } from "./modules/modifyAtags";
 
  
@@ -46,14 +45,18 @@ const useStyles = makeStyles(theme => ({
 
 const App = (props) => {
     const classes = useStyles();
-        // Paperのかげの程度を設定
+    // Paperのかげの程度を設定
     const elevation = 3;
     // // モーダルウィンドウの開閉状態管理
     const [isOpen, setIsOpen] = useState(false);
     // どのモーダルウィンドウを開いたか
     const [whichModal, setWhichModal] = useState('magazines');
+    // 記事ページのmodal windowの開閉状態
     const [isArticleOpen, setIsArticleOpen] = useState(false)
+    // どの記事がarticke modalにセットされるか
     const [whichArticle, setWhichArticle] = useState(0)
+    // PMainの横方向のスクロール位置
+    // const [scrollX, setScrollX] = useState(0)
     
     const handleCloseArticleModal = () => {
         setIsArticleOpen(false)
@@ -69,16 +72,13 @@ const App = (props) => {
 
     
     // ↓ArticleContextの使い方はこれで統一
-    const {params, dispatch, setArticles, setTotalPages, setTags, setAuthors} = React.useContext(ArticleContext);
+    const {params, setArticles, setTotalPages, setTags, setAuthors} = React.useContext(ArticleContext);
 
     console.log(params);
     
-    // useEffect(() => {
-    //   const articles = getWpPosts(params, setTotalPages);
-    //   setArticles(articles);
-    // }, [params]);
     useEffect(() => {
       getWpPosts(params, setTotalPages, setArticles);
+    //   scrollBackToInitial()
     }, [params]);
 
     useEffect(() => getWpTags(setTags), []);
