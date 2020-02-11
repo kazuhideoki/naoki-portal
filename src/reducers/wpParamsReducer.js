@@ -50,7 +50,7 @@ export function wpParamsReducer(state = wpParams, action) {
 export const setParamsHome = () => ({
          type: "HOME",
        });
-export const setParamsLatest = () => ({
+export const setParamsLatest = () => ({ 
          type: "LATEST"
        });
 export const setParamsRrev = () => ({

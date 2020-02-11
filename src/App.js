@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { store } from './index';
-import { setArticles } from "./reducers/wpSetDataReducer";
+import { setArticles, setTags, setAuthors } from "./reducers/wpSetDataReducer";
 import { setTotalPage } from "./reducers/appStateReducer";
 import { Grid, } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
@@ -9,7 +8,7 @@ import { makeStyles } from "@material-ui/styles";
 import PHeader from "./PHeader"; 
 import PMain from "./PMain";
 // import PFooter from "./PFooter";
-// import PPagination from "./PPagination";
+import PPagination from "./PPagination";
 import PArticleModal from "./PArticleModal";
 import { getWpPosts, getWpTags, getWpUsers } from "./modules/wpAPIFetch";
  
@@ -48,7 +47,19 @@ const App = ({wpParams}) => {
     React.useEffect(() => {
         const prm = { wpParams, setArticles, setTotalPage };
         getWpPosts(prm);
+    // },[wpParams])
     },[])
+    React.useEffect(() => {
+        const prm = { setTags };
+        getWpTags(prm);
+    },[])
+    React.useEffect(() => {
+        const prm = { setAuthors };
+        getWpUsers(prm);
+    },[])
+
+
+   console.log('Appだよ');
    
     return (
     
@@ -59,18 +70,18 @@ const App = ({wpParams}) => {
         justify="center"
         alignItems="stretch"
         >
-        <Grid item className={classes.header}>
-            <PHeader />
-        </Grid>
-        <Grid>
-            <PMain />
-            {/* <PArticleModal /> */}
-        </Grid>
-        <Grid item className={classes.footer}>
-            {/* <PFooter /> */}
-        </Grid>
-        {/* <PPagination /> */}
-        {/* <PFooterModal /> */}
+            <Grid item className={classes.header}>
+                <PHeader />
+            </Grid>
+            <Grid>
+                <PMain />
+                {/* <PArticleModal /> */}
+            </Grid>
+            <Grid item className={classes.footer}>
+            <PPagination />
+                {/* <PFooter /> */}
+            {/* <PFooterModal /> */}
+            </Grid>
         </Grid>
         
     );

@@ -54,19 +54,22 @@ export function getTotalPages(response) {
 }
 export function wpApiToData({
          response,
+         setTags,
+         setAuthors,
          ...actionCreators
        }) {
-           const {setArticles, setTotalPage} = actionCreators//アクションクリエーターを入れる→totalPageとarticleのセット
-           let totalPage
+         const { setArticles, setTotalPage } = actionCreators; //アクションクリエーターを入れる→totalPageとarticleのセット
+         let totalPage;
          response.then(response => {
            if (setTotalPage) {
-               const num = getTotalPages(response)
-               store.dispatch(setTotalPage(num))
+             const num = getTotalPages(response);
+             store.dispatch(setTotalPage(num));
            }
            response
              .json()
-             .then((data) => {
-                 store.dispatch(setArticles(data));
+             .then(data => {
+               const actionCreator = setArticles || setTags || setAuthors;
+               store.dispatch(actionCreator(data));
              })
              .catch(error => {
                console.log("catch errorだよ " + error);
@@ -133,22 +136,20 @@ export function getWpPosts({wpParams, ...actionCreators}) {
          });
        }
 // tag取得日英に分けてsetTagsに格納
-export function getWpTags(setTags) {
-    const params = makeApiParamsTags(50);
-    const response = fetchData(params);
-        return wpApiToData({
-          response,
-          sortDataTags,
-          setTags
-        });
-       }
-// userを取得
-export function getWpUsers(setAuthors) {
-    const params = makeApiParamsUsers(50);
-    const response = fetchData(params);
+export function getWpTags({setTags}) {
+         const params = makeApiParamsTags(50);
+         const response = fetchData(params);
          return wpApiToData({
            response,
-           sortDataUsers,
+           setTags
+         });
+       }
+// userを取得
+export function getWpUsers({setAuthors}) {
+         const params = makeApiParamsUsers(50);
+         const response = fetchData(params);
+         return wpApiToData({
+           response,
            setAuthors
          });
        }
