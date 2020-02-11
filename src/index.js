@@ -1,14 +1,29 @@
 import React from "react";
 import { render } from "react-dom";
+import { createStore, combineReducers, applyMiddleware } from "redux";
+import thunkMiddleware from "redux-thunk";
+import logger from "redux-logger";
+import { Provider } from "react-redux";
+import { wpParamsReducer } from "./reducers/wpParamsReducer";
+import { appStateReducer } from "./reducers/appStateReducer";
+import { wpSetDataReducer } from "./reducers/wpSetDataReducer";
 import App from "./App";
-import { ThemeProvider, ArticleContextProvider } from "./modules/Store";
+import { ThemeProvider } from "./ThemeContext";
 import * as serviceWorker from "./serviceWorker";
+
+const rootReducers = combineReducers({
+  wpParamsReducer,
+  wpSetDataReducer,
+  appStateReducer
+});
+
+export const store = createStore(rootReducers, applyMiddleware(thunkMiddleware, logger));
 
 render(
   <ThemeProvider>
-    <ArticleContextProvider>
+    <Provider store={store}>
       <App />
-    </ArticleContextProvider>
+    </Provider>
   </ThemeProvider>,
   document.getElementById("root")
 );

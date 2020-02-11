@@ -1,5 +1,8 @@
-import React, {useContext}from 'react'
-import { ThemeContext } from "./modules/Store";
+import React from 'react'
+import { connect } from "react-redux";
+// import { switchLang } from "./reducers/wpParamsReducer";
+import { setWhichModal, openModal } from "./reducers/appStateReducer";
+import { ThemeContext } from "./ThemeContext";
 import { Grid, Paper } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import {
@@ -10,7 +13,6 @@ import {
   PersonAddTwoTone,
   ListAltTwoTone
 } from "@material-ui/icons";
-import { ArticleContext } from "./modules/Store";
 
 const useStyle = makeStyles({
   root: {
@@ -25,24 +27,20 @@ const useStyle = makeStyles({
 });
 
 export const PFooter = ({
-         className,
-         elevation,
-         handleClickOpen,
-         ...props
+         articles,
+         setWhichModal,
+         openModal,
+         switchLang
        }) => {
          const classes = useStyle();
-
-         const theme = useContext(ThemeContext);
-         const articleData = useContext(
-           ArticleContext
-         );
+         const { theme, elevation } = React.useContext(ThemeContext);
 
          return (
            <Paper elevation={elevation} className={classes.root}>
              <Grid container justify="center">
                <Grid item>
                  <Translate
-                   onClick={() => articleData.dispatch({ type: "lang" })}
+                   onClick={() => dispatch({ type: "lang" })}
                    color="primary"
                    style={theme.icon}
                  />
@@ -81,3 +79,18 @@ export const PFooter = ({
            </Paper>
          );
        };
+
+const mapStateToProps = state => {
+  return {
+    articles: state.articles,
+  };
+};
+const mapDispatchToProps = dispatch => {
+  return {
+    // switchLang,
+    setWhichModal,
+    openModal
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PFooter);

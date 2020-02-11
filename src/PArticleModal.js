@@ -1,4 +1,10 @@
 import React from 'react'
+import { connect } from "react-redux";
+import {
+  openArticle,
+  closeArticle,
+  setWitchArticle
+} from "./reducers/appStateReducer";
 import {
   Paper,
   Dialog,
@@ -8,9 +14,6 @@ import {
   withStyles
 } from "@material-ui/core";
 import { HighlightOff } from "@material-ui/icons";
-import { ArticleContext } from './modules/Store';
-import { modifyAtags } from "./modules/modifyAtags";
-import { fetchSinglePost } from './modules/wpApiSinglePost';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -35,49 +38,56 @@ const StyledHighlightOff = withStyles({
 
 
 
-export const PArticle = ({ isArticleOpen, onClick, whichArticle, ...props }) => {
-    const { articles, setArticles } = React.useContext(
-      ArticleContext
-    );
-    // let ref = React.useRef()
-    // ref.current.
-    
-    let param
-    let content
-    if (articles.length){
-        const article = articles[whichArticle];
-        
-        param = '<h1>' + article.title + '</h1>' + article.content
+export const PArticleModal = ({
+    showWhichArticle,
+    isArticleOpen,
+    articles,
+    closeArticle,
+    }) => {
 
+        let article;
+        let content;
+        if (articles.length) {
+        article = articles[showWhichArticle];
 
-        content = (
-        <Paper >
-          <div
-            className="content"
-            dangerouslySetInnerHTML={{ __html: param }}
-          />
-          </Paper>
+        content = "<h1>" + article.title + "</h1>" + article.content;
+
+        article = (
+            <Paper>
+            <div
+                className="content"
+                dangerouslySetInnerHTML={{ __html: content }}
+            />
+            </Paper>
         );
-    }
+        }
 
-    // React.useEffect(() => {
-    //     modifyAtags(fetchSinglePost(articles, setArticles));
-    // }, [whichArticle])
-    // React.useEffect(() => {
-    //     fetchSinglePost(articles, setArticles);
-    // }, [whichArticle])
-
-    return (
-      <StyledDialog
-        open={isArticleOpen}
-        TransitionComponent={Transition}
-        onClose={onClick}
-        {...props}
-      >
-        <StyledHighlightOff onClick={onClick} />
-        <DialogContent>
-          <DialogContentText>{content}</DialogContentText>
-        </DialogContent>
-      </StyledDialog>
+        return (
+        <StyledDialog
+            open={isArticleOpen}
+            TransitionComponent={Transition}
+            onClose={closeArticle} //要チェック
+        >
+            <StyledHighlightOff onClick={closeArticle} />
+            <DialogContent>
+            <DialogContentText>{article}</DialogContentText>
+            </DialogContent>
+        </StyledDialog>
     );
 };
+
+const mapStateToProps = state => {
+  return {
+    articles: state.articles,
+    showWhichArticle: state.appState.showWhichArticle,
+    isArticleOpen: state.appState.isArticleOpen
+  };
+};
+const mapDispatchToProps = dispatch => {
+  return {
+    openArticle,
+    closeArticle,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PArticleModal);

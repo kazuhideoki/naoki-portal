@@ -1,7 +1,10 @@
 import React from "react";
+import { connect } from "react-redux";
+import { openArticle, setWitchArticle } from "./reducers/appStateReducer";
+import { sortDataPosts } from "./modules/wpAPIFetch";
 import { Grid, Paper } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import { ArticleContext } from "./modules/Store";
+import { ThemeContext } from "./ThemeContext";
 
 const useStyles = makeStyles({
     root: {
@@ -20,44 +23,57 @@ const useStyles = makeStyles({
 });
 
 
-export const PMain = ({ setIsArticleOpen, setWhichArticle, elevation }) => {
-         const classes = useStyles();
-         const { articles } = React.useContext(
-           ArticleContext
-         );
-        //  記事画面を表示させるための関数
-         const onClick = (key) => {
-            setIsArticleOpen(true)
-            setWhichArticle(Number(key))
-         }
+const PMain = ({ openArticle, setWitchArticle, articles }) => {
+  const classes = useStyles();
+  const { elevation } = React.useContext(ThemeContext);
 
-         let displayArticles
-         if (articles) {
-             displayArticles = articles.map((value, key) => (
-               <Grid item key={key} className={classes.item}>
-                 <Paper
-                   className={classes.article}
-                   onClick={() => onClick(key)}
-                   elevation={elevation}
-                 >
-                   <h2>{value.title}</h2>
-                   <div dangerouslySetInnerHTML={{ __html: value.excerpt }} />
-                   <img
-                     className={classes.img}
-                      src={value.featuredImg}
-                     alt={value.title}
-                   />
-                 </Paper>
-               </Grid>
-             ));
-           
-         }else{
-            displayArticles = <Paper>No articles</Paper>
-         }
+  //  記事画面を表示させるための関数
+  const onClick = key => {
+    openArticle();
+    setWitchArticle(Number(key));
+  };
 
-         return (
-           <Grid container wrap="nowrap" className={classes.root}>
-             {displayArticles}
-           </Grid>
-         );
-       };
+  let displayArticles;
+  if (articles) {
+    displayArticles = articles.map((value, key) => (
+      <Grid item key={key} className={classes.item}>
+        <Paper
+          className={classes.article}
+          onClick={() => onClick(key)}
+          elevation={elevation}
+        >
+          <h2>{value.title}</h2>
+          <div dangerouslySetInnerHTML={{ __html: value.excerpt }} />
+          <img
+            className={classes.img}
+            src={value.featuredImg}
+            alt={value.title}
+          />
+        </Paper>
+      </Grid>
+    ));
+  } else {
+    displayArticles = <Paper>No articles</Paper>;
+  }
+
+  return (
+    <Grid container wrap="nowrap" className={classes.root}>
+      {displayArticles}
+    </Grid>
+  );
+};
+
+const mapStateToProps = state => {
+    return {
+      articles: sortDataPosts(state.wpSetDataReducer.articles)
+    };
+}
+const mapDispatchToProps = dispatch => {
+    return {
+      openArticle,
+      setWitchArticle
+    };
+};
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(PMain);

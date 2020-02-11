@@ -1,3 +1,6 @@
+import { store } from "../index";
+import { setTotalPage } from "../reducers/appStateReducer";
+
 export function makeApiParamsPosts(state, perPage) {
   const per_page = perPage;
   let categories;
@@ -25,7 +28,7 @@ export function makeApiParamsPosts(state, perPage) {
     page +
     "&author=" +
     author +
-    "&tags=" +
+    "&tags=" + 
     tag;
 
   console.log(params);
@@ -46,31 +49,24 @@ export function fetchData(params) {
     return fetch(`https://naokihair.com/wp-json/wp/v2/${params}`);
 }
 
-export function getTotalPages(response, setTotalPages) {
-  const totalPages = Number(response.headers.get("x-wp-totalpages"));
-  setTotalPages(totalPages);
+export function getTotalPages(response) {
+    return Number(response.headers.get("x-wp-totalpages"));
 }
 export function wpApiToData({
          response,
-         sortDataPosts,
-         sortDataTags,
-         sortDataUsers,
-         setArticles,
-         setTags,
-         setAuthors,
-         getTotalPages,
-         setTotalPages
+         ...actionCreators
        }) {
+           const {setArticles, setTotalPage} = actionCreators//アクションクリエーターを入れる→totalPageとarticleのセット
+           let totalPage
          response.then(response => {
-           if (getTotalPages) {
-             getTotalPages(response, setTotalPages);
+           if (setTotalPage) {
+               const num = getTotalPages(response)
+               store.dispatch(setTotalPage(num))
            }
            response
              .json()
-             .then(data => {
-               const sortData = sortDataPosts || sortDataTags || sortDataUsers;
-               const setData = setArticles || setTags || setAuthors;
-               setData(sortData(data));
+             .then((data) => {
+                 store.dispatch(setArticles(data));
              })
              .catch(error => {
                console.log("catch errorだよ " + error);
@@ -123,18 +119,19 @@ export function sortDataUsers(data) {
     return authors
 }
 
+
+
 // メインのpostの記事取得
-export function getWpPosts(state, setTotalPages, setArticles) {
-    const params = makeApiParamsPosts(state, 6);
-    const response = fetchData(params)
-    return wpApiToData({
-      response,
-      sortDataPosts,
-      setArticles,
-      getTotalPages,
-      setTotalPages
-    });
-}
+export function getWpPosts({wpParams, ...actionCreators}) {
+         const params = makeApiParamsPosts(wpParams, 6);
+         const response = fetchData(params);
+         console.log(response);
+
+         return wpApiToData({
+           response,
+           ...actionCreators
+         });
+       }
 // tag取得日英に分けてsetTagsに格納
 export function getWpTags(setTags) {
     const params = makeApiParamsTags(50);

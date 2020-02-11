@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { connect } from "react-redux";
+import { store } from './index';
+import { setArticles } from "./reducers/wpSetDataReducer";
+import { setTotalPage } from "./reducers/appStateReducer";
 import { Grid, } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import PModal from "./PModal";
+// import PFooterModal from "./PFooterModal";
 import PHeader from "./PHeader"; 
-import { PMain } from "./PMain";
-import { PFooter } from "./PFooter";
-import { PPagination } from "./PPagination";
-import { ArticleContext } from "./modules/Store";
-import { PArticle } from "./PArticleModal";
+import PMain from "./PMain";
+// import PFooter from "./PFooter";
+// import PPagination from "./PPagination";
+import PArticleModal from "./PArticleModal";
 import { getWpPosts, getWpTags, getWpUsers } from "./modules/wpAPIFetch";
-// import { modifyAtags } from "./modules/modifyAtags";
-
  
 // 3段のコンテナの整形に関してのみ記述, 
 const useStyles = makeStyles(theme => ({
@@ -41,94 +42,51 @@ const useStyles = makeStyles(theme => ({
 
 
 
-const App = (props) => {
+const App = ({wpParams}) => {
     const classes = useStyles();
-    // Paperのかげの程度を設定
-    const elevation = 3;
-    // // モーダルウィンドウの開閉状態管理
-    const [isOpen, setIsOpen] = useState(false);
-    // どのモーダルウィンドウを開いたか
-    const [whichModal, setWhichModal] = useState('magazines');
-    // 記事ページのmodal windowの開閉状態
-    const [isArticleOpen, setIsArticleOpen] = useState(false)
-    // どの記事がarticke modalにセットされるか
-    const [whichArticle, setWhichArticle] = useState(0)
-    
-    const handleCloseArticleModal = () => {
-        setIsArticleOpen(false)
-    }
-    const handleClose = () => {
-        setIsOpen(false);
-    }
 
-    const handleClickOpen = value => {
-      setIsOpen(true);
-      setWhichModal(value);
-    };
-
-    
-    // ↓ArticleContextの使い方はこれで統一
-    const {params, setArticles, setTotalPages, setTags, setAuthors} = React.useContext(ArticleContext);
-
-    console.log(params);
-    
-    useEffect(() => {
-      getWpPosts(params, setTotalPages, setArticles);
-        console.log('getWpPosts');
-        
-    }, [params]);
-
-    useEffect(() => {
-        getWpTags(setTags)
-        getWpUsers(setAuthors);
-        console.log("getWpTags,setAuthors");
-    }, []);
-    
-    console.log('Appだよ');
-    
+    React.useEffect(() => {
+        const prm = { wpParams, setArticles, setTotalPage };
+        getWpPosts(prm);
+    },[])
+   
     return (
-      <Grid
+    
+        <Grid
         spacing={0}
         container
         direction="column"
         justify="center"
         alignItems="stretch"
-      >
+        >
         <Grid item className={classes.header}>
-          <PHeader elevation={elevation} />
+            <PHeader />
         </Grid>
-        <Grid item className={classes.main}>
-          <PMain
-            className={classes.articles}
-            setIsArticleOpen={setIsArticleOpen}
-            setWhichArticle={setWhichArticle}
-            elevation={elevation}
-          />
-          <PPagination handleClickOpen={handleClickOpen} />
+        <Grid>
+            <PMain />
+            {/* <PArticleModal /> */}
         </Grid>
         <Grid item className={classes.footer}>
-          <PFooter elevation={elevation} handleClickOpen={handleClickOpen} />
+            {/* <PFooter /> */}
         </Grid>
-
-        <PArticle
-          isArticleOpen={isArticleOpen}
-          onClick={handleCloseArticleModal}
-          whichArticle={whichArticle}
-        />
-
-        <PModal
-          isOpen={isOpen}
-          setIsOpen={setIsOpen}
-          onClick={handleClose}
-          elevation={elevation}
-          whichModal={whichModal}
-          setWhichModal={setWhichModal}
-          handleClickOpen={handleClickOpen}
-        />
-      </Grid>
+        {/* <PPagination /> */}
+        {/* <PFooterModal /> */}
+        </Grid>
+        
     );
 }
 
 
 
-export default App;
+const mapStateToProps = state => {
+  return {
+    wpParams: state.wpParamsReducer,
+  };
+};
+const mapDispatchToProps = dispatch => {
+  return {
+
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
