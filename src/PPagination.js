@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArticleContext } from "./modules/Store";
+import { Store } from "./modules/Store";
 import {
     Home,
   FirstPage,
@@ -10,100 +10,105 @@ import {
   Person
 } from "@material-ui/icons";
 
-export const PPagination = ({handleClickOpen}) => {
-         const articleData = React.useContext(ArticleContext);
-         const page = articleData.params.currentPage;
+const PPaginationContainer = ({presenter}) => {
+    const { wpParams, dispatchWpParams, dispatchAppState, totalPages } = React.useContext(
+      Store
+    );
 
-         const home = (
-           <Home
-             onClick={() => articleData.dispatch({ type: "home" })}
-           />
-         );
-        const tag = <Label onClick={() =>handleClickOpen("tag")} />;
+    const changeParams = (type, payload) => {
+        if (payload) {
+            dispatchWpParams({ type: type, payload: payload });
+        }else{
+            dispatchWpParams({type: type})
+        }
+    }
 
-        const author = <Person onClick={() => handleClickOpen("author")} />;
-        
+    const openModal = modalName =>
+        dispatchAppState({ type: "OPEN_MODAL", payload: modalName });
 
-         const pageNumber = (
-           <>
-             【 {page}/{articleData.totalPages} 】
-           </>
-         );
+    const props = {
+        wpParams,
+        changeParams,
+        openModal,
+        totalPages
+    };
 
-         let [latest, prev, next, oldest] = "";
+    return presenter(props)
+}
 
-        //  ページ数が3より大きい場合latestとoldestを表示
-         if (page > 3 && articleData.totalPages > 3) {
-           latest = (
-             <FirstPage
-               onClick={() => articleData.dispatch({ type: "latest" })}
-             />
-           );
-         }
-         if (!(page === 1)) {
-           prev = (
-             <NavigateBefore
-               onClick={() => articleData.dispatch({ type: "prev" })}
-             />
-           );
-         }
-         if (!(page === articleData.totalPages)) {
-           next = (
-             <NavigateNext
-               onClick={() => articleData.dispatch({ type: "next" })}
-             />
-           );
-         }
-         if ( page < articleData.totalPages - 2 && articleData.totalPages > 3) {
-           oldest = (
-             <LastPage
-               onClick={() =>
-                 articleData.dispatch({
-                   type: "oldest",
-                   page: articleData.totalPages
-                 })
-               }
-             />
-           );
-         }
+const PPaginationPresenter = ({
+  wpParams,
+  changeParams,
+  openModal,
+  totalPages
+}) => {
+  const page = wpParams.currentPage;
 
-         const number1 = page - 2;
-         const number2 = page - 1;
-         const number3 = page;
-         const number4 = page + 1;
-         const number5 = page + 2;
+  const home = <Home onClick={ () => changeParams("HOME")} />;
+  const tag = <Label onClick={ () => openModal("tag")} />;
 
-         const numbers = [number1, number2, number3, number4, number5];
+  const author = <Person onClick={ () => openModal("author")} />;
 
-         const displayNumbers = numbers.map(num => {
-           if (num <= 0) {
-             return "";
-           } else if (num > articleData.totalPages) {
-             return "";
-           } else if (num === page) {
-             return <button key={num}>{num}</button>;
-           }
-           return (
-             <button
-               key={num}
-               onClick={() => articleData.dispatch({ type: "num", page: num })}
-             >
-               {num}
-             </button>
-           );
-         });
+  const pageNumber = (
+    <>
+      【 {page}/{totalPages} 】
+    </>
+  );
 
-         return (
-           <div>
-             {home}
-             {tag}
-             {author}
-             {pageNumber}
-             {latest}
-             {prev}
-             {displayNumbers}
-             {next}
-             {oldest}
-           </div>
-         );
-       };
+  let [latest, prev, next, oldest] = "";
+
+  //  ページ数が3より大きい場合latestとoldestを表示
+  if (page > 3 && totalPages > 3) {
+    latest = <FirstPage onClick={ () => changeParams("LATEST")} />;
+  }
+  if (!(page === 1)) {
+    prev = <NavigateBefore onClick={ () => changeParams("PREV")} />;
+  }
+  if (!(page === totalPages)) {
+    next = <NavigateNext onClick={ () => changeParams("NEXT")} />;
+  }
+  if (page < totalPages - 2 && totalPages > 3) {
+    oldest = <LastPage onClick={ () => changeParams("OLDEST", totalPages)} />;
+  }
+
+  const number1 = page - 2;
+  const number2 = page - 1;
+  const number3 = page;
+  const number4 = page + 1;
+  const number5 = page + 2;
+
+  const numbers = [number1, number2, number3, number4, number5];
+
+  const displayNumbers = numbers.map(num => {
+    if (num <= 0) {
+      return "";
+    } else if (num > totalPages) {
+      return "";
+    } else if (num === page) {
+      return <button key={num}>{num}</button>;
+    }
+    return (
+      <button key={num} onClick={ () => changeParams("NUM", num)}>
+        {num}
+      </button>
+    );
+  });
+
+  return (
+    <div>
+      {home}
+      {tag}
+      {author}
+      {pageNumber}
+      {latest}
+      {prev}
+      {displayNumbers}
+      {next}
+      {oldest}
+    </div>
+  );
+};
+
+export const PPagination = () => (
+    <PPaginationContainer presenter={props => <PPaginationPresenter {...props} />} />
+);

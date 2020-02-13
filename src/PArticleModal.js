@@ -8,7 +8,8 @@ import {
   withStyles
 } from "@material-ui/core";
 import { HighlightOff } from "@material-ui/icons";
-import { ArticleContext } from './modules/Store';
+import { Store } from './modules/Store';
+import { sortDataPosts } from "./modules/wpApiFetch";
 import { modifyAtags } from "./modules/modifyAtags";
 import { fetchSinglePost } from './modules/wpApiSinglePost';
 
@@ -34,50 +35,74 @@ const StyledHighlightOff = withStyles({
 })(HighlightOff);
 
 
+const PArticleModalContainer = ({presenter}) => {
+    const { wpData, appState, dispatchAppState } = React.useContext(Store);
 
-export const PArticle = ({ isArticleOpen, onClick, whichArticle, ...props }) => {
-    const { articles, setArticles } = React.useContext(
-      ArticleContext
+    const articles = sortDataPosts(wpData.articles) || [
+      {
+        title: "",
+        excerpt: "",
+        content: "",
+        link: "",
+        featuredImg: ""
+      }
+    ];
+    const isArticleModalOpen = appState.isArticleModalOpen
+    const setArticleModal = appState.setArticleModal;
+    const closeArticleModal = () => dispatchAppState({ type: "CLOSE_ARTICLE_MODAL" });
+
+    const props = {
+      articles,
+      isArticleModalOpen,
+      setArticleModal,
+      closeArticleModal,
+    };
+     
+    return presenter(props);
+}
+const PArticleModalPresenter = ({
+  articles,
+  isArticleModalOpen,
+  setArticleModal,
+  closeArticleModal
+}) => {
+  let singleArticle;
+  let content;
+  if (articles.length) {
+   
+    const article = articles[setArticleModal];    
+    // if (typeof article.title !== "undefined") {
+      singleArticle =
+      "<h1>" + article.title + "</h1>" + article.content 
+    // }
+    // "<h1>" + article.title || "" + "</h1>" + article.content || "";
+
+    content = (
+      <Paper>
+        <div
+          className="content"
+          dangerouslySetInnerHTML={{ __html: singleArticle }}
+        />
+      </Paper>
     );
-    // let ref = React.useRef()
-    // ref.current.
-    
-    let param
-    let content
-    if (articles.length){
-        const article = articles[whichArticle];
-        
-        param = '<h1>' + article.title + '</h1>' + article.content
+  }
 
-
-        content = (
-        <Paper >
-          <div
-            className="content"
-            dangerouslySetInnerHTML={{ __html: param }}
-          />
-          </Paper>
-        );
-    }
-
-    // React.useEffect(() => {
-    //     modifyAtags(fetchSinglePost(articles, setArticles));
-    // }, [whichArticle])
-    // React.useEffect(() => {
-    //     fetchSinglePost(articles, setArticles);
-    // }, [whichArticle])
-
-    return (
-      <StyledDialog
-        open={isArticleOpen}
-        TransitionComponent={Transition}
-        onClose={onClick}
-        {...props}
-      >
-        <StyledHighlightOff onClick={onClick} />
-        <DialogContent>
-          <DialogContentText>{content}</DialogContentText>
-        </DialogContent>
-      </StyledDialog>
-    );
+  return (
+    <StyledDialog
+      open={isArticleModalOpen}
+      TransitionComponent={Transition}
+      onClose={closeArticleModal}
+    >
+      <StyledHighlightOff onClick={closeArticleModal} />
+      <DialogContent>
+        <DialogContentText>{content}</DialogContentText>
+      </DialogContent>
+    </StyledDialog>
+  );
 };
+
+export const PArticleModal = () => (
+  <PArticleModalContainer
+    presenter={props => <PArticleModalPresenter {...props} />}
+  />
+);

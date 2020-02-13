@@ -12,14 +12,12 @@ const useStyles = makeStyles({
     }
 });
 
-const PHeader = props => {
+export const PHeader = props => {
   const classes = useStyles();
 
   return (
-    <Paper className={`${classes.root}`} elevation={props.elevation} onClick={props.onClick}>
+    <Paper className={classes.root}>
       <h1 className={classes.h1}>Reactで作ったportal</h1>
     </Paper>
   );
 };
-
-export default PHeader

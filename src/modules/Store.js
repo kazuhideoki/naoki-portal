@@ -1,11 +1,7 @@
 import React, { useReducer, useState } from "react";
-import { reducer } from "./reducer";
-
-const themes = {
-  icon: {
-    fontSize: 100
-  }
-};
+import { wpParamsReducer } from "./wpParamsReducer";
+import { wpDataReducer } from "./wpDataReducer";
+import { appStateReducer } from "./appStateReducer";
 
 const initParams = {
     currentPage: 1,
@@ -14,57 +10,48 @@ const initParams = {
     isJa: false,
 };
 
-const initArticles = [
-  {
-    title: "<h1>title</h1>",
-    excerpt: "<p>excerpt</p>",
-    content: "<p>content</p>",
-    link: "",
-    featuredImg: ""
-  }
-];
+const initWpData = { 
+    articles: [],
+    tags: [],
+    users: []
+}
 
-const ThemeContext = React.createContext();
-const ArticleContext = React.createContext();
+const initAppState = {
+    setModal: 'magazines',
+    isModalOpen: false,
+    setArticleModal: 0,
+    isArticleModalOpen: false,
+}
 
-const ThemeProvider = ({ children }) =>  (
-    <ThemeContext.Provider value={themes}>
-        {children}
-    </ThemeContext.Provider>
-)
+const Store = React.createContext();
 
-const ArticleContextProvider = ({children}) => {
-    const [params, dispatch] = useReducer(reducer, initParams);
-    // 取得された記事を格納する変数
-    const [articles, setArticles] = useState(initArticles);
+const StoreContextProvider = ({children}) => {
+    const [wpParams, dispatchWpParams] = useReducer(wpParamsReducer, initParams);
+    const [wpData, dispatchWpData] = useReducer(wpDataReducer, initWpData);
+    const [appState, dispatchAppState] = useReducer(
+      appStateReducer,
+      initAppState
+    );
     // トータルページ数を取得、paginationに利用
     const [totalPages, setTotalPages] = useState(1)
-    const [tags, setTags] = useState({
-        tagsEn: [],
-        tagsJa: []
-    });
-    const [authors, setAuthors] = useState([]);
 
     const values = {
-      params: params,
-      dispatch: dispatch,
-      totalPages: totalPages,
-      setTotalPages: setTotalPages,
-      tags: tags,
-      setTags: setTags,
-      authors: authors,
-      setAuthors: setAuthors,
-      articles: articles,
-      setArticles: setArticles,
+      wpParams,
+      dispatchWpParams,
+      wpData,
+      dispatchWpData,
+      appState,
+      dispatchAppState,
+      totalPages,
+      setTotalPages,
     };
 
     return (
-      <ArticleContext.Provider value={ values }>
+      <Store.Provider value={ values }>
         {children}
-      </ArticleContext.Provider>
+      </Store.Provider>
     );
 
 }
 
-
-export { ThemeContext, ArticleContext, ThemeProvider, ArticleContextProvider };
+export { Store, StoreContextProvider };

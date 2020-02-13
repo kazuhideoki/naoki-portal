@@ -1,14 +1,15 @@
 import React from "react";
 import { render } from "react-dom";
-import App from "./App";
-import { ThemeProvider, ArticleContextProvider } from "./modules/Store";
+import { App } from "./App";
+import { ThemeProvider } from "./modules/ThemeContext";
+import { StoreContextProvider } from "./modules/Store";
 import * as serviceWorker from "./serviceWorker";
 
 render(
   <ThemeProvider>
-    <ArticleContextProvider>
+    <StoreContextProvider>
       <App />
-    </ArticleContextProvider>
+    </StoreContextProvider>
   </ThemeProvider>,
   document.getElementById("root")
 );

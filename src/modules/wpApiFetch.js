@@ -31,6 +31,10 @@ export function makeApiParamsPosts(state, perPage) {
   console.log(params);
   return "posts" + params;
 }
+export function makeApiParamsSeinglePosts(slug) {
+    const params = "?slug=" + slug;
+    return "posts" + params;
+}
 export function makeApiParamsTags(perPage) {
   const per_page = perPage;
   const params = "?per_page=" + per_page;
@@ -52,12 +56,9 @@ export function getTotalPages(response, setTotalPages) {
 }
 export function wpApiToData({
          response,
-         sortDataPosts,
-         sortDataTags,
-         sortDataUsers,
          setArticles,
          setTags,
-         setAuthors,
+         setUsers,
          getTotalPages,
          setTotalPages
        }) {
@@ -68,9 +69,8 @@ export function wpApiToData({
            response
              .json()
              .then(data => {
-               const sortData = sortDataPosts || sortDataTags || sortDataUsers;
-               const setData = setArticles || setTags || setAuthors;
-               setData(sortData(data));
+               const setData = setArticles || setTags || setUsers;
+               setData(data);
              })
              .catch(error => {
                console.log("catch errorだよ " + error);
@@ -88,7 +88,6 @@ export function sortDataPosts(data) {
       featuredImg: index.jetpack_featured_media_url
     });
   });
-  console.log(articles);
   return articles;
 }
 export function sortDataTags(data) {
@@ -107,7 +106,6 @@ export function sortDataTags(data) {
       });
     }
   });
-  console.log({ tagsJa, tagsEn });
   return { tagsJa, tagsEn };
 }
 export function sortDataUsers(data) {
@@ -119,39 +117,53 @@ export function sortDataUsers(data) {
         img: index.avatar_urls["96"]
       });
     });
-    console.log(authors);
     return authors
 }
 
 // メインのpostの記事取得
-export function getWpPosts(state, setTotalPages, setArticles) {
-    const params = makeApiParamsPosts(state, 6);
-    const response = fetchData(params)
-    return wpApiToData({
-      response,
-      sortDataPosts,
-      setArticles,
-      getTotalPages,
-      setTotalPages
-    });
-}
-// tag取得日英に分けてsetTagsに格納
-export function getWpTags(setTags) {
-    const params = makeApiParamsTags(50);
-    const response = fetchData(params);
-        return wpApiToData({
-          response,
-          sortDataTags,
-          setTags
-        });
-       }
-// userを取得
-export function getWpUsers(setAuthors) {
-    const params = makeApiParamsUsers(50);
-    const response = fetchData(params);
+export function getWpPosts({ wpParams, setArticles, setTotalPages }) {
+         const params = makeApiParamsPosts(wpParams, 6);
+         const response = fetchData(params);
+         console.log("getWpPostsだよ");
+
          return wpApiToData({
            response,
-           sortDataUsers,
-           setAuthors
+           setArticles,
+           getTotalPages,
+           setTotalPages
+         });
+       }
+
+export function getWpSinglePosts(slug, wpData, setData) {
+         const params = makeApiParamsSeinglePosts(slug);
+         const response = fetchData(params);
+         console.log("getWpSinglePostsだよ");
+
+         return wpApiToData({
+           response,
+           wpData,
+           setData
+         });
+       }
+// tag取得日英に分けてsetTagsに格納
+export function getWpTags({setTags}) {
+         const params = makeApiParamsTags(50);
+         const response = fetchData(params);
+         console.log("getWpTagsだよ");
+
+         return wpApiToData({
+           response,
+           setTags
+         });
+       }
+// userを取得
+export function getWpUsers({setUsers}) {
+         const params = makeApiParamsUsers(50);
+         const response = fetchData(params);
+         console.log("getWpUsersだよ");
+
+         return wpApiToData({
+           response,
+           setUsers
          });
        }

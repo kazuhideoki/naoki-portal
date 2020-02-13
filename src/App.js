@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Grid, } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import PModal from "./PModal";
-import PHeader from "./PHeader"; 
+import {PModal} from "./PModal";
+import {PHeader} from "./PHeader"; 
 import { PMain } from "./PMain";
 import { PFooter } from "./PFooter";
 import { PPagination } from "./PPagination";
-import { ArticleContext } from "./modules/Store";
-import { PArticle } from "./PArticleModal";
-import { getWpPosts, getWpTags, getWpUsers } from "./modules/wpAPIFetch";
-// import { modifyAtags } from "./modules/modifyAtags";
+import { Store } from "./modules/Store";
+import { PArticleModal } from "./PArticleModal";
+import { getWpPosts, getWpTags, getWpUsers } from "./modules/wpApiFetch";
 
  
 // 3段のコンテナの整形に関してのみ記述, 
@@ -39,96 +38,71 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-
-
-const App = (props) => {
+const AppContainer = ({presenter})=> {
     const classes = useStyles();
-    // Paperのかげの程度を設定
-    const elevation = 3;
-    // // モーダルウィンドウの開閉状態管理
-    const [isOpen, setIsOpen] = useState(false);
-    // どのモーダルウィンドウを開いたか
-    const [whichModal, setWhichModal] = useState('magazines');
-    // 記事ページのmodal windowの開閉状態
-    const [isArticleOpen, setIsArticleOpen] = useState(false)
-    // どの記事がarticke modalにセットされるか
-    const [whichArticle, setWhichArticle] = useState(0)
-    
-    const handleCloseArticleModal = () => {
-        setIsArticleOpen(false)
-    }
-    const handleClose = () => {
-        setIsOpen(false);
-    }
+    const { wpParams, dispatchWpData, setTotalPages } = React.useContext(Store);
+    const setArticles = data =>
+        dispatchWpData({ type: "SET_ARTICLES", payload: data });
+    const setTags = data =>
+        dispatchWpData({ type: "SET_TAGS", payload: data });
+    const setUsers = data =>
+        dispatchWpData({ type: "SET_USERS", payload: data });
 
-    const handleClickOpen = value => {
-      setIsOpen(true);
-      setWhichModal(value);
+    const props = {
+      classes,
+      wpParams,
+      setArticles,
+      setTags,
+      setUsers,
+      setTotalPages
     };
-
-    
-    // ↓ArticleContextの使い方はこれで統一
-    const {params, setArticles, setTotalPages, setTags, setAuthors} = React.useContext(ArticleContext);
-
-    console.log(params);
-    
-    useEffect(() => {
-      getWpPosts(params, setTotalPages, setArticles);
-        console.log('getWpPosts');
-        
-    }, [params]);
-
-    useEffect(() => {
-        getWpTags(setTags)
-        getWpUsers(setAuthors);
-        console.log("getWpTags,setAuthors");
-    }, []);
-    
-    console.log('Appだよ');
-    
-    return (
-      <Grid
-        spacing={0}
-        container
-        direction="column"
-        justify="center"
-        alignItems="stretch"
-      >
-        <Grid item className={classes.header}>
-          <PHeader elevation={elevation} />
-        </Grid>
-        <Grid item className={classes.main}>
-          <PMain
-            className={classes.articles}
-            setIsArticleOpen={setIsArticleOpen}
-            setWhichArticle={setWhichArticle}
-            elevation={elevation}
-          />
-          <PPagination handleClickOpen={handleClickOpen} />
-        </Grid>
-        <Grid item className={classes.footer}>
-          <PFooter elevation={elevation} handleClickOpen={handleClickOpen} />
-        </Grid>
-
-        <PArticle
-          isArticleOpen={isArticleOpen}
-          onClick={handleCloseArticleModal}
-          whichArticle={whichArticle}
-        />
-
-        <PModal
-          isOpen={isOpen}
-          setIsOpen={setIsOpen}
-          onClick={handleClose}
-          elevation={elevation}
-          whichModal={whichModal}
-          setWhichModal={setWhichModal}
-          handleClickOpen={handleClickOpen}
-        />
-      </Grid>
-    );
+    return presenter(props)
 }
 
+const AppPresenter = ({
+  classes,
+  wpParams,
+  setArticles,
+  setTags,
+  setUsers,
+  setTotalPages
+}) => {
+  React.useEffect(() => {
+    getWpPosts({ wpParams, setArticles, setTotalPages });
+  }, [wpParams]);
 
+  React.useEffect(() => {
+    getWpTags({ setTags });
+  }, []);
+  React.useEffect(() => {
+    getWpUsers({ setUsers });
+  }, []);
 
-export default App;
+  console.log("Appだよ");
+  return (
+    <Grid
+      spacing={0}
+      container
+      direction="column"
+      justify="center"
+      alignItems="stretch"
+    >
+      <Grid item className={classes.header}>
+        <PHeader />
+      </Grid>
+      <Grid item className={classes.main}>
+        <PMain />
+        <PPagination />
+      </Grid>
+      <Grid item className={classes.footer}>
+        <PFooter />
+      </Grid>
+      <PArticleModal />
+      <PModal />
+    </Grid>
+  );
+};
+
+export const App = () => (
+  <AppContainer presenter={props => <AppPresenter {...props} />} />
+);

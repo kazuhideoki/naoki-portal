@@ -1,5 +1,4 @@
 import React, {useContext}from 'react'
-import { ThemeContext } from "./modules/Store";
 import { Grid, Paper } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import {
@@ -10,7 +9,8 @@ import {
   PersonAddTwoTone,
   ListAltTwoTone
 } from "@material-ui/icons";
-import { ArticleContext } from "./modules/Store";
+import { ThemeContext } from "./modules/ThemeContext";
+import { Store } from "./modules/Store";
 
 const useStyle = makeStyles({
   root: {
@@ -24,51 +24,60 @@ const useStyle = makeStyles({
   }
 });
 
-export const PFooter = ({
-         className,
-         elevation,
-         handleClickOpen,
-         ...props
-       }) => {
-         const classes = useStyle();
+const PFooterContainer = ({presenter}) => {
+    const classes = useStyle();
+    const elevation = classes.elevation;
+    const theme = useContext(ThemeContext);
+    const { dispatchWpParams, dispatchAppState } = useContext(Store);
 
-         const theme = useContext(ThemeContext);
-         const articleData = useContext(
-           ArticleContext
-         );
+    const changeParams = (type) => {
+        dispatchWpParams({ type: type });
+    }
+    const openModal = modalName =>
+      dispatchAppState({ type: "OPEN_MODAL", payload: modalName });
 
+    const props = {
+        classes,
+      theme,
+      changeParams,
+      openModal
+    };
+
+    return presenter(props)
+}
+const PFooterPresenter = ({ classes, theme, changeParams, openModal }) => {
          return (
-           <Paper elevation={elevation} className={classes.root}>
+           <Paper elevation={theme.elevation} className={classes.root}>
              <Grid container justify="center">
                <Grid item>
                  <Translate
-                   onClick={() => articleData.dispatch({ type: "lang" })}
+                   onClick={ () => changeParams("LANG")}
                    color="primary"
                    style={theme.icon}
                  />
                </Grid>
                <Grid item>
                  <ImportContactsTwoTone
-                   onClick={() => handleClickOpen("magazines")}
+                   onClick={ () => openModal("magazines")}
                    fontSize="large"
                    style={theme.icon}
                  />
                </Grid>
                <Grid item>
                  <SignalWifi3BarTwoTone
-                   onClick={() => handleClickOpen("wifi")}
+                   onClick={ () => openModal("wifi")}
                    style={theme.icon}
                  />
                </Grid>
                <Grid item>
                  <ThumbUpTwoTone
-                   onClick={() => handleClickOpen("review")}
+                   onClick={ () => openModal("review")}
                    style={theme.icon}
                  />
                </Grid>
                <Grid item>
                  <ListAltTwoTone
-                   onClick={() => handleClickOpen("menus")}
+                   onClick={ () => openModal("menus")}
                    style={theme.icon}
                  />
                </Grid>
@@ -81,3 +90,8 @@ export const PFooter = ({
            </Paper>
          );
        };
+export const PFooter = () => (
+  <PFooterContainer
+    presenter={props => <PFooterPresenter {...props} />}
+  />
+);
