@@ -25,31 +25,41 @@ const PMainContainer = ({presenter}) => {
     const classes = useStyles();
     const { elevation } = React.useContext(ThemeContext);
 
-    const { wpData, dispatchAppState } = React.useContext(Store);
+    const { wpData, dispatchWpData, dispatchAppState } = React.useContext(Store);
     const articles = sortDataPosts(wpData.articles);
-    const openArticleModal = key =>
-      dispatchAppState({ type: "OPEN_ARTICLE_MODAL", payload: key });
+    const setAndOpenArticleModal = data => {
+        dispatchWpData({type: "SET_SINGLE_ARTICLE", payload: data})
+        dispatchAppState({ type: "OPEN_ARTICLE_MODAL"})
+    }
     
     const props = {
-        classes,
-        elevation,
-        articles,
-        openArticleModal
-    }
+        wpData,
+      classes,
+      elevation,
+      articles,
+      setAndOpenArticleModal
+    };
 
     return presenter(props)
 
 }
 
-const PMainPresenter = ({ classes, elevation, articles, openArticleModal }) => {
-    
+const PMainPresenter = ({
+    wpData,
+  classes,
+  elevation,
+  articles,
+  setAndOpenArticleModal
+}) => {
   let displayArticles;
+//   let targetArticle = []
+
   if (articles) {
     displayArticles = articles.map((value, key) => (
       <Grid item key={key} className={classes.item}>
         <Paper
           className={classes.article}
-          onClick={() => openArticleModal(key)}
+          onClick={() => setAndOpenArticleModal([wpData.articles[key]])}
           elevation={elevation}
         >
           <h2>{value.title}</h2>

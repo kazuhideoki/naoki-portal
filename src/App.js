@@ -78,7 +78,7 @@ const AppPresenter = ({
     getWpUsers({ setUsers });
   }, []);
 
-  console.log("Appだよ");
+//   console.log("Appだよ");
   return (
     <Grid
       spacing={0}

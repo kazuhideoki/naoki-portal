@@ -57,6 +57,7 @@ export function getTotalPages(response, setTotalPages) {
 export function wpApiToData({
          response,
          setArticles,
+         setSingleArticle,
          setTags,
          setUsers,
          getTotalPages,
@@ -69,7 +70,10 @@ export function wpApiToData({
            response
              .json()
              .then(data => {
-               const setData = setArticles || setTags || setUsers;
+               const setData =
+                 setArticles || setSingleArticle || setTags || setUsers;
+                 console.log(data);
+                 
                setData(data);
              })
              .catch(error => {
@@ -78,6 +82,8 @@ export function wpApiToData({
          });
        }
 export function sortDataPosts(data) {
+    console.log(data);
+    
   let articles = [];
   data.forEach(index => {
     articles.push({
@@ -133,16 +139,15 @@ export function getWpPosts({ wpParams, setArticles, setTotalPages }) {
            setTotalPages
          });
        }
-
-export function getWpSinglePosts(slug, wpData, setData) {
+// PArticleModalで記事内にあるリンクを取得。記事データもsetSingleArticleで格納
+export function getWpSinglePosts({ slug, setSingleArticle }) {
          const params = makeApiParamsSeinglePosts(slug);
          const response = fetchData(params);
          console.log("getWpSinglePostsだよ");
 
          return wpApiToData({
            response,
-           wpData,
-           setData
+           setSingleArticle
          });
        }
 // tag取得日英に分けてsetTagsに格納

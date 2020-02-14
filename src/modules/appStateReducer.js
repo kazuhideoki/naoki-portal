@@ -1,7 +1,7 @@
 const initAppState = {
   setModal: "magazines",
   isModalOpen: false,
-  setArticleModal: 0,
+//   setArticleModal: 0,
   isArticleModalOpen: false
 };
 
@@ -21,7 +21,7 @@ export function appStateReducer(state, action) {
     case "OPEN_ARTICLE_MODAL":
     return {
         ...state,
-        setArticleModal: action.payload,
+        // setArticleModal: action.payload,
         isArticleModalOpen: true
     };
     case "CLOSE_ARTICLE_MODAL":

@@ -10,16 +10,17 @@ const initParams = {
     isJa: false,
 };
 
-const initWpData = { 
-    articles: [],
-    tags: [],
-    users: []
-}
+const initWpData = {
+  articles: [],
+  articleModal: [],
+  tags: [],
+  users: []
+};
 
 const initAppState = {
     setModal: 'magazines',
     isModalOpen: false,
-    setArticleModal: 0,
+    // setArticleModal: 0,
     isArticleModalOpen: false,
 }
 
